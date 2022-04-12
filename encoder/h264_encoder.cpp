@@ -244,10 +244,16 @@ void H264Encoder::EncodeBuffer(int fd, size_t size, void *mem, StreamInfo const 
 		// We need to find an available output buffer (input to the codec) to
 		// "wrap" the DMABUF.
 		std::lock_guard<std::mutex> lock(input_buffers_available_mutex_);
+		//printf("input_buffers_available_ free:%d\n", input_buffers_available_.size());
 		if (input_buffers_available_.empty())
-			throw std::runtime_error("no buffers available to queue codec input");
+		{
+			//throw std::runtime_error("no buffers available to queue codec input");
+			printf("encoder not ready, dropping frame\n");
+			return;
+		}
 		index = input_buffers_available_.front();
 		input_buffers_available_.pop();
+		
 	}
 	v4l2_buffer buf = {};
 	v4l2_plane planes[VIDEO_MAX_PLANES] = {};
@@ -347,12 +353,16 @@ void H264Encoder::outputThread()
 
 				if (!output_queue_.empty())
 				{
+					//printf("output_queue_ free:%d\n", input_buffers_available_.size());
 					item = output_queue_.front();
 					output_queue_.pop();
 					break;
 				}
 				else
+				{
+					//printf("output_queue_ wait...\n");
 					output_cond_var_.wait_for(lock, 200ms);
+				}
 			}
 		}
 

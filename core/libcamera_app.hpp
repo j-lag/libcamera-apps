@@ -102,6 +102,8 @@ public:
 	void Teardown();
 	void StartCamera();
 	void StopCamera();
+	
+	void SetBufferCount(int bufferCount);
 
 	Msg Wait();
 	void PostMessage(MsgType &t, MsgPayload &p);

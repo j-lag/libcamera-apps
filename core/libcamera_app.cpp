@@ -278,6 +278,11 @@ void LibcameraApp::ConfigureStill(unsigned int flags)
 		std::cerr << "Still capture setup complete" << std::endl;
 }
 
+void LibcameraApp::SetBufferCount(int bufferCount) 
+{
+	configuration_->at(0).bufferCount = bufferCount; 
+}
+
 void LibcameraApp::ConfigureVideo(unsigned int flags)
 {
 	if (options_->verbose)
@@ -301,7 +306,8 @@ void LibcameraApp::ConfigureVideo(unsigned int flags)
 	// Now we get to override any of the default settings from the options_->
 	StreamConfiguration &cfg = configuration_->at(0);
 	cfg.pixelFormat = libcamera::formats::YUV420;
-	cfg.bufferCount = 6; // 6 buffers is better than 4
+	//cfg.bufferCount = 6; // 6 buffers is better than 4
+	SetBufferCount(10);
 	if (options_->width)
 		cfg.size.width = options_->width;
 	if (options_->height)
